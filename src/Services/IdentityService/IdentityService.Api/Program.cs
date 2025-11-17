@@ -1,13 +1,64 @@
+using FluentValidation;
+using IdentityService.Application.Interfaces;
+using IdentityService.Application.UseCases.Auth.Login;
+using IdentityService.Infrastructure.Repositories;
+using IdentityService.Infrastructure.Services;
+using MediatR;
+using Microsoft.Data.SqlClient;
+using System.Data;
+using System.Security.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.OpenApi.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddSingleton(builder.Configuration);
+var connectionString = builder.Configuration.GetConnectionString("IdentityDb");
+
+builder.Services.AddScoped<IDbConnection>(sp => new SqlConnection(connectionString));
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddSingleton<IPasswordHasher, PasswordHasherService>();
+
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssembly(typeof(LoginCommand).Assembly));
+
+builder.Services.AddValidatorsFromAssembly(typeof(LoginCommandValidator).Assembly);
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "JWT Authorization header using the Bearer scheme."
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
+
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -16,29 +67,42 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.MapGroup("/auth").MapAuthApi();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+app.MapGet("/", () => Results.Ok("Identity Service is running."));
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+
+public static class AuthEndpoints
 {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    public static RouteGroupBuilder MapAuthApi(this RouteGroupBuilder group)
+    {
+        group.MapPost("/login", async (LoginCommand command, IMediator mediator) =>
+        {
+            try
+            {
+                var validator = new LoginCommandValidator();
+                var validationResult = await validator.ValidateAsync(command);
+                if (!validationResult.IsValid)
+                {
+                    return Results.BadRequest(validationResult.Errors);
+                }
+
+                var result = await mediator.Send(command);
+
+                return Results.Ok(result);
+            }
+            catch (AuthenticationException ex)
+            {
+                return Results.Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem("Ocurrió un error inesperado.", statusCode: 500);
+            }
+        });
+
+        return group;
+    }
 }
