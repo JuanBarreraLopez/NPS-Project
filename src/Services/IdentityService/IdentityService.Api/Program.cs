@@ -8,6 +8,7 @@ using IdentityService.Api;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Security.Authentication;
+using IdentityService.Application.UseCases.Auth.Refresh;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
@@ -106,6 +107,33 @@ public static class AuthEndpoints
             }
         });
 
+        group.MapPost("/refresh", async (RefreshTokenCommand command, IMediator mediator) =>
+        {
+            try
+            {
+                var validator = new RefreshTokenCommandValidator();
+                var validationResult = await validator.ValidateAsync(command);
+                if (!validationResult.IsValid)
+                {
+                    return Results.BadRequest(validationResult.Errors);
+                }
+
+                var result = await mediator.Send(command);
+
+                return Results.Ok(result);
+            }
+            catch (AuthenticationException ex)
+            {
+                return Results.Json(new { message = ex.Message }, statusCode: StatusCodes.Status401Unauthorized);
+            }
+            catch (Exception)
+            {
+                return Results.Problem("Ocurrió un error inesperado.", statusCode: 500);
+            }
+        });
+
         return group;
     }
+
+
 }
