@@ -11,71 +11,48 @@ using Dapper;
 
 namespace IdentityService.Infrastructure.Repositories
 {
-    /**
-     * Implementación del repositorio de usuarios.
-     * Utiliza Dapper para comunicarse con SQL Server.
-     * Esta clase implementa el contrato 'IUserRepository' de la capa 'Application'.
-     */
     public class UserRepository : IUserRepository
     {
-        private readonly string _connectionString;
+        private readonly IDbConnection _connection;
 
-        public UserRepository()
+        public UserRepository(IDbConnection connection)
         {
-            // ¡Placeholder! Esto lo configuraremos globalmente después.
-            _connectionString = "Server=...;Database=IdentityDB;...;";
-        }
-
-        private IDbConnection CreateConnection()
-        {
-            return new SqlConnection(_connectionString);
+            _connection = connection;
         }
 
         public async Task<User?> GetByUsernameAsync(string username)
         {
-            using (var connection = CreateConnection())
-            {
-                var sql = "SELECT * FROM Users WHERE Username = @Username";
-                return await connection.QueryFirstOrDefaultAsync<User>(sql, new { Username = username });
-            }
+            var sql = "SELECT * FROM Users WHERE Username = @Username";
+            return await _connection.QueryFirstOrDefaultAsync<User>(sql, new { Username = username });
         }
 
         public async Task<User?> GetByIdAsync(Guid userId)
         {
-            using (var connection = CreateConnection())
-            {
-                var sql = "SELECT * FROM Users WHERE Id = @UserId";
-                return await connection.QueryFirstOrDefaultAsync<User>(sql, new { UserId = userId });
-            }
+            var sql = "SELECT * FROM Users WHERE Id = @UserId";
+            return await _connection.QueryFirstOrDefaultAsync<User>(sql, new { UserId = userId });
         }
 
         public async Task AddAsync(User user)
         {
-            using (var connection = CreateConnection())
-            {
-                var sql = @"
-                    INSERT INTO Users (Id, Username, PasswordHash, PasswordSalt, Role, IsBlocked, FailedAttempts, LastActivityUtc, CreatedAtUtc)
-                    VALUES (@Id, @Username, @PasswordHash, @PasswordSalt, @Role, @IsBlocked, @FailedAttempts, @LastActivityUtc, @CreatedAtUtc)";
-                await connection.ExecuteAsync(sql, user);
-            }
+            var sql = @"
+                INSERT INTO Users (Id, Username, PasswordHash, PasswordSalt, Role, IsBlocked, FailedAttempts, LastActivityUtc, CreatedAtUtc)
+                VALUES (@Id, @Username, @PasswordHash, @PasswordSalt, @Role, @IsBlocked, @FailedAttempts, @LastActivityUtc, @CreatedAtUtc)";
+            await _connection.ExecuteAsync(sql, user);
         }
 
         public async Task UpdateAsync(User user)
         {
-            using (var connection = CreateConnection())
-            {
-                var sql = @"
-                    UPDATE Users 
-                    SET 
-                        PasswordHash = @PasswordHash,
-                        PasswordSalt = @PasswordSalt,
-                        Role = @Role,
-                        IsBlocked = @IsBlocked,
-                        FailedAttempts = @FailedAttempts,
-                        LastActivityUtc = @LastActivityUtc
-                    WHERE Id = @Id";
-                await connection.ExecuteAsync(sql, user);
-            }
+            var sql = @"
+                UPDATE Users 
+                SET 
+                    PasswordHash = @PasswordHash,
+                    PasswordSalt = @PasswordSalt,
+                    Role = @Role,
+                    IsBlocked = @IsBlocked,
+                    FailedAttempts = @FailedAttempts,
+                    LastActivityUtc = @LastActivityUtc
+                WHERE Id = @Id";
+            await _connection.ExecuteAsync(sql, user);
         }
     }
 }

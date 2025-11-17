@@ -10,7 +10,7 @@ namespace IdentityService.Domain
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
-        public string Token { get; set; }
+        public string Token { get; set; } = string.Empty;
         public DateTime ExpiresAtUtc { get; set; }
         public DateTime CreatedAtUtc { get; set; }
         public bool Revoked { get; set; }

@@ -4,6 +4,7 @@ using IdentityService.Application.UseCases.Auth.Login;
 using IdentityService.Infrastructure.Repositories;
 using IdentityService.Infrastructure.Services;
 using MediatR;
+using IdentityService.Api;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Security.Authentication;
@@ -71,6 +72,8 @@ app.MapGroup("/auth").MapAuthApi();
 
 app.MapGet("/", () => Results.Ok("Identity Service is running."));
 
+app.SeedDatabase();
+
 app.Run();
 
 
@@ -95,9 +98,9 @@ public static class AuthEndpoints
             }
             catch (AuthenticationException ex)
             {
-                return Results.Unauthorized(new { message = ex.Message });
+                return Results.Json(new { message = ex.Message }, statusCode: StatusCodes.Status401Unauthorized);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return Results.Problem("Ocurrió un error inesperado.", statusCode: 500);
             }

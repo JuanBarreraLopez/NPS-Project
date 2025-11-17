@@ -9,10 +9,10 @@ namespace IdentityService.Domain
     public class User
     {
         public Guid Id { get; set; }
-        public string Username { get; set; }
-        public byte[] PasswordHash { get; set; }
-        public byte[] PasswordSalt { get; set; }
-        public string Role { get; set; } // "ADMIN" o "VOTANTE"
+        public string Username { get; set; } = string.Empty;
+        public byte[] PasswordHash { get; set; } = new byte[0];
+        public byte[] PasswordSalt { get; set; } = new byte[0];
+        public string Role { get; set; } = string.Empty;
         public bool IsBlocked { get; set; }
         public int FailedAttempts { get; set; }
         public DateTime LastActivityUtc { get; set; }
