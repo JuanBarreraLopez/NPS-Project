@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using IdentityService.Application.UseCases.Users.Create;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -70,6 +71,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapGroup("/auth").MapAuthApi();
+
+app.MapGroup("/users").MapUserApi();
 
 app.MapGet("/", () => Results.Ok("Identity Service is running."));
 
@@ -136,4 +139,44 @@ public static class AuthEndpoints
     }
 
 
+
+
+}
+
+public static class UserEndpoints
+{
+    public static RouteGroupBuilder MapUserApi(this RouteGroupBuilder group)
+    {
+        // Endpoint: POST /users/create
+        group.MapPost("/create", async (CreateUserCommand command, IMediator mediator) =>
+        {
+            try
+            {
+                // 1. Validar la entrada
+                var validator = new CreateUserCommandValidator();
+                var validationResult = await validator.ValidateAsync(command);
+                if (!validationResult.IsValid)
+                {
+                    return Results.BadRequest(validationResult.Errors);
+                }
+
+                // 2. Enviar el comando al handler
+                var newUserId = await mediator.Send(command);
+
+                // 3. Devolver el ID del nuevo usuario
+                return Results.Created($"/users/{newUserId}", new { id = newUserId });
+            }
+            catch (ValidationException ex)
+            {
+                // Si el usuario ya existe
+                return Results.Conflict(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return Results.Problem("Ocurrió un error inesperado.", statusCode: 500);
+            }
+        });
+
+        return group;
+    }
 }
