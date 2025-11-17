@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace IdentityService.Application.UseCases.Auth.Login
 {
-    internal class LoginResult
+    public class LoginResult
     {
+        public string Username { get; set; }
+        public string Role { get; set; }
+        public string AccessToken { get; set; }
+        public string RefreshToken { get; set; }
     }
 }
