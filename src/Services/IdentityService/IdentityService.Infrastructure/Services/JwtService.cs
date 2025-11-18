@@ -12,12 +12,12 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Dapper; 
+using Dapper;
 
 namespace IdentityService.Infrastructure.Services
 {
     /**
-     * Implementación del servicio de JWT 
+     * Implementación del servicio de JWT
      * Firma tokens y maneja refresh tokens en la BBDD
      */
     public class JwtService : IJwtService
@@ -42,24 +42,27 @@ namespace IdentityService.Infrastructure.Services
         public string GenerateAccessToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_config["Jwt:Key"] ?? "UNA_CLAVE_SECRETA_MUY_LARGA_PARA_PRUEBAS"); 
+            var key = Encoding.ASCII.GetBytes(_config["Jwt:Key"] ?? "UNA_CLAVE_SECRETA_MUY_LARGA_PARA_PRUEBAS");
 
             var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Name, user.Username),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Role, user.Role) // ¡Importante para los permisos!
-            };
+    {
+        new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+        new Claim(JwtRegisteredClaimNames.Name, user.Username),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new Claim(ClaimTypes.Role, user.Role)
+    };
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                // El token de acceso dura poco
-                // 5 minutos de inactividad, pero el token puede durar más
-                // La *sesión* se manejará en la capa Application.
                 Expires = DateTime.UtcNow.AddMinutes(15),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+
+                Issuer = _config["Jwt:Issuer"],
+                Audience = _config["Jwt:Audience"],
+
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);

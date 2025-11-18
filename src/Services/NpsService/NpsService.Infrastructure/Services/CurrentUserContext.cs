@@ -7,10 +7,6 @@ using System.Security.Claims;
 
 namespace NpsService.Infrastructure.Services
 {
-    /**
-     * Implementación del lector de contexto de usuario.
-     * Lee el token JWT que viene en la solicitud HTTP.
-     */
     public class CurrentUserContext : ICurrentUserContext
     {
         private readonly IHttpContextAccessor _httpContextAccessor;

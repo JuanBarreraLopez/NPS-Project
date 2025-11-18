@@ -3,7 +3,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
 using NpsService.Application.Interfaces;
 using NpsService.Application.UseCases.Votes.Submit;
@@ -14,7 +13,6 @@ using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.Services.AddSingleton(builder.Configuration);
 
@@ -57,6 +55,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddAuthorization();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -86,6 +86,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -99,9 +100,11 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+
 app.MapGroup("/votes").MapVoteApi();
 
 app.MapGet("/", () => Results.Ok("Nps Service is running."));
+
 
 app.Run();
 
@@ -114,7 +117,6 @@ public static class VoteEndpoints
         {
             try
             {
-
                 var validator = new SubmitVoteCommandValidator();
                 var validationResult = await validator.ValidateAsync(command);
                 if (!validationResult.IsValid)
@@ -128,12 +130,10 @@ public static class VoteEndpoints
             }
             catch (ValidationException ex)
             {
-                // Si el usuario ya votó
                 return Results.Conflict(new { message = ex.Message });
             }
             catch (ApplicationException ex)
             {
-                // Si el token es inválido
                 return Results.Json(new { message = ex.Message }, statusCode: StatusCodes.Status401Unauthorized);
             }
             catch (Exception)
