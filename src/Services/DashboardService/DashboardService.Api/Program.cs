@@ -1,34 +1,32 @@
-using FluentValidation;
+using DashboardService.Application.Interfaces;
+using DashboardService.Application.UseCases.Dashboard.GetSummary;
+using DashboardService.Application.UseCases.Dashboard.GetRecentVotes;
+using DashboardService.Infrastructure.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using NpsService.Application.Interfaces;
-using NpsService.Application.UseCases.Votes.Submit;
-using NpsService.Infrastructure.Repositories;
-using NpsService.Infrastructure.Services;
 using System.Data;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
 
 builder.Services.AddSingleton(builder.Configuration);
 
 var connectionString = builder.Configuration.GetConnectionString("VotesDb");
 builder.Services.AddScoped<IDbConnection>(sp => new SqlConnection(connectionString));
 
-builder.Services.AddHttpContextAccessor();
-
-builder.Services.AddScoped<IVoteRepository, VoteRepository>();
-builder.Services.AddScoped<ICurrentUserContext, CurrentUserContext>();
+builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 
 builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(SubmitVoteCommand).Assembly));
+    cfg.RegisterServicesFromAssembly(typeof(GetDashboardSummaryQuery).Assembly));
 
-
-builder.Services.AddValidatorsFromAssembly(typeof(SubmitVoteCommandValidator).Assembly);
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]!);
@@ -55,7 +53,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdminRole", policy =>
+        policy.RequireRole("ADMIN"));
+});
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -112,48 +115,25 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
-app.MapGroup("/votes").MapVoteApi();
+var dashboardGroup = app.MapGroup("/dashboard");
 
-app.MapGet("/", () => Results.Ok("Nps Service is running."));
+dashboardGroup.MapGet("/summary", async (IMediator mediator) =>
+{
+    var query = new GetDashboardSummaryQuery();
+    var result = await mediator.Send(query);
+    return Results.Ok(result);
+})
+.RequireAuthorization("RequireAdminRole");
 
+dashboardGroup.MapGet("/recent-votes", async (IMediator mediator) =>
+{
+    var query = new GetRecentVotesQuery();
+    var result = await mediator.Send(query);
+    return Results.Ok(result);
+})
+.RequireAuthorization("RequireAdminRole");
+
+
+app.MapGet("/", () => Results.Ok("Dashboard Service is running."));
 
 app.Run();
-
-
-public static class VoteEndpoints
-{
-    public static RouteGroupBuilder MapVoteApi(this RouteGroupBuilder group)
-    {
-        group.MapPost("/submit", async (SubmitVoteCommand command, IMediator mediator) =>
-        {
-            try
-            {
-                var validator = new SubmitVoteCommandValidator();
-                var validationResult = await validator.ValidateAsync(command);
-                if (!validationResult.IsValid)
-                {
-                    return Results.BadRequest(validationResult.Errors);
-                }
-
-                await mediator.Send(command);
-
-                return Results.Ok(new { message = "Voto registrado exitosamente." });
-            }
-            catch (ValidationException ex)
-            {
-                return Results.Conflict(new { message = ex.Message });
-            }
-            catch (ApplicationException ex)
-            {
-                return Results.Json(new { message = ex.Message }, statusCode: StatusCodes.Status401Unauthorized);
-            }
-            catch (Exception)
-            {
-                return Results.Problem("Ocurrió un error inesperado.", statusCode: 500);
-            }
-        })
-        .RequireAuthorization();
-
-        return group;
-    }
-}
