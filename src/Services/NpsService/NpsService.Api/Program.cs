@@ -112,11 +112,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
-app.MapGroup("/votes").MapVoteApi();
+app.MapGroup("/api/nps").MapVoteApi();
 
-app.MapGet("/", () => Results.Ok("Nps Service is running."));
-
-
+app.MapGet("/", () => Results.Ok("Nps Service is running."));
 app.Run();
 
 

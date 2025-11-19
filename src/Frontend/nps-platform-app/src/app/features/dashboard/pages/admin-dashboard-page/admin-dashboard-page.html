@@ -1,0 +1,31 @@
+<div class="dashboard-layout">
+    <app-text-label text="Panel Administrativo NPS" level="h1"></app-text-label>
+
+    <section class="summary-cards">
+        <app-metric-card 
+            label="NPS Score" 
+            [value]="summary()?.npsScore?.toFixed(0) || '...'" 
+            valueLevel="score"
+            subtext="Net Promoter Score"
+        ></app-metric-card>
+
+        <app-metric-card 
+            label="Total Votos" 
+            [value]="summary()?.totalVotes?.toString() || '...'" 
+        ></app-metric-card>
+
+        <app-metric-card 
+            label="Promotores (9-10)" 
+            [value]="summary()?.promoters?.toString() || '...'" 
+        ></app-metric-card>
+        
+        <app-metric-card 
+            label="Detractores (0-6)" 
+            [value]="summary()?.detractors?.toString() || '...'" 
+        ></app-metric-card>
+    </section>
+
+    <section class="recent-votes-section">
+        <app-recent-votes-list [votes]="recentVotes()"></app-recent-votes-list>
+    </section>
+</div>

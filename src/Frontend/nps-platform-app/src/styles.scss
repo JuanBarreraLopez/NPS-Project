@@ -1,1 +1,33 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-primary: #007bff;        // Azul brillante
+  --color-primary-dark: #0056b3;   // Azul oscuro para hover
+  --color-secondary: #6c757d;      // Gris para texto secundario
+  --color-background: #f4f7f6;    // Fondo muy claro
+  --color-card-bg: #ffffff;        // Fondo de tarjeta
+  --color-border: #e9ecef;         // Borde de tarjeta
+  --color-success: #28a745;        // Promotor (Verde)
+  --color-danger: #dc3545;         // Detractor (Rojo)
+  --color-warning: #ffc107;        // Pasivo (Amarillo)
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--color-background);
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Base de Contenedores */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}

@@ -1,6 +1,6 @@
 using DashboardService.Application.Interfaces;
-using DashboardService.Application.UseCases.Dashboard.GetSummary;
 using DashboardService.Application.UseCases.Dashboard.GetRecentVotes;
+using DashboardService.Application.UseCases.Dashboard.GetSummary;
 using DashboardService.Infrastructure.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -11,11 +11,10 @@ using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-
-var builder = WebApplication.CreateBuilder(args);
+using System.Text.Unicode;
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton(builder.Configuration);
 
@@ -29,7 +28,9 @@ builder.Services.AddMediatR(cfg =>
 
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]!);
+
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
+
 
 builder.Services.AddAuthentication(options =>
 {
@@ -115,7 +116,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
-var dashboardGroup = app.MapGroup("/dashboard");
+var dashboardGroup = app.MapGroup("/api/dashboard");
+
 
 dashboardGroup.MapGet("/summary", async (IMediator mediator) =>
 {

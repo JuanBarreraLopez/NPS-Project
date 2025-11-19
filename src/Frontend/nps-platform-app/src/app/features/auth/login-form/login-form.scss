@@ -1,0 +1,59 @@
+.login-form-container {
+    max-width: 450px;
+    margin: 10vh auto; 
+    padding: 40px;
+    background: var(--color-card-bg);
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); 
+    border-top: 5px solid var(--color-primary); 
+}
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-weight: 700;
+    font-size: 1.8em;
+}
+.error-message {
+    color: var(--color-danger);
+    background-color: rgba(220, 53, 69, 0.1);
+    border: 1px solid var(--color-danger);
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 0.9em;
+}
+
+.input-container {
+    margin-bottom: 20px; 
+}
+.input-container > label {
+    display: block;
+    font-size: 0.9em;
+    font-weight: 600; 
+    margin-bottom: 8px;
+    color: var(--color-secondary);
+}
+.input-field {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px; 
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    font-size: 1em;
+}
+.input-field:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); 
+    outline: none;
+}
+
+.input-error {
+    color: var(--color-danger); 
+    font-size: 0.8em;
+    margin-top: -15px; 
+    margin-bottom: 15px;
+    padding-left: 5px;
+}

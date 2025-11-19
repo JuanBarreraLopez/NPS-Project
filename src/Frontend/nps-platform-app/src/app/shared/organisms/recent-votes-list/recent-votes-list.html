@@ -1,0 +1,21 @@
+<div class="list-container">
+    <app-text-label text="Últimos Votos y Comentarios" level="h2"></app-text-label>
+    
+    <div *ngIf="votes.length === 0" class="no-data">
+        No se encontraron votos recientes.
+    </div>
+
+    <div *ngFor="let vote of votes" class="vote-item">
+        <div 
+          class="score-badge" 
+          [class.promoter]="vote.score >= 9" 
+          [class.detractor]="vote.score <= 6" 
+          [class.passive]="vote.score > 6 && vote.score < 9">
+            {{ vote.score }}
+        </div>
+        <div class="details">
+            <p class="comment">{{ vote.comment || 'Sin comentario.' }}</p>
+            <span class="timestamp">Votado el {{ formatTimestamp(vote.submittedAt) }}</span>
+        </div>
+    </div>
+</div>

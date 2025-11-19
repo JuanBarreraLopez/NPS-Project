@@ -1,20 +1,23 @@
 using FluentValidation;
+using IdentityService.Api;
 using IdentityService.Application.Interfaces;
 using IdentityService.Application.UseCases.Auth.Login;
+using IdentityService.Application.UseCases.Auth.Refresh;
+using IdentityService.Application.UseCases.Users.Create;
 using IdentityService.Infrastructure.Repositories;
 using IdentityService.Infrastructure.Services;
 using MediatR;
-using IdentityService.Api;
-using Microsoft.Data.SqlClient;
-using System.Data;
-using System.Security.Authentication;
-using IdentityService.Application.UseCases.Auth.Refresh;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using IdentityService.Application.UseCases.Users.Create;
 using Microsoft.OpenApi.Models;
+using System.Data;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Authentication;
+using System.Text;
+
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,7 +85,7 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowAngularApp");
 
-app.MapGroup("/auth").MapAuthApi();
+app.MapGroup("/api/identity").MapAuthApi();
 
 app.MapGroup("/users").MapUserApi();
 
