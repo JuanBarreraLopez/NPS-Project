@@ -4,12 +4,21 @@ import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-interface LoginRequest { username: string; password: string; }
-interface RegisterRequest { email: string; password: string; }
-interface AuthResult { token: string; email: string; }
+interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+interface AuthResult {
+  accessToken: string;
+  refreshToken: string;
+  role: string;
+  username: string;
+  email?: string;
+}
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private readonly identityUrl = environment.identityApiUrl;
@@ -28,11 +37,18 @@ export class AuthService {
 
   login(credentials: LoginRequest): Observable<AuthResult> {
     const url = `${this.identityUrl}/login`;
+
     return this.http.post<AuthResult>(url, credentials).pipe(
-      tap(result => {
-        this.setToken(result.token);
+      tap((result) => {
+        this.setToken(result.accessToken);
+
         this.isAuthenticated.set(true);
-        this.router.navigate(['/dashboard']);
+
+        if (result.role === 'ADMIN') {
+          this.router.navigate(['/admin/dashboard']);
+        } else {
+          this.router.navigate(['/vote']);
+        }
       })
     );
   }

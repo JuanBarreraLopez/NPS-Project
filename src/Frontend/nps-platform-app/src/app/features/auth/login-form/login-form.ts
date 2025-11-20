@@ -1,8 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-
 import { AuthService } from '../../../core/services/auth.service';
 import { ButtonComponent } from '../../../shared/atoms/button/button';
 
@@ -16,7 +14,6 @@ import { ButtonComponent } from '../../../shared/atoms/button/button';
 export class LoginFormComponent implements OnInit {
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
-  private router = inject(Router);
 
   loginForm!: FormGroup;
 
@@ -45,7 +42,7 @@ export class LoginFormComponent implements OnInit {
 
     this.authService.login({ username: email, password: password }).subscribe({
       next: () => {
-        this.router.navigate(['/dashboard']);
+        this.loading.set(false);
       },
       error: (err) => {
         console.error('Login fallido:', err);

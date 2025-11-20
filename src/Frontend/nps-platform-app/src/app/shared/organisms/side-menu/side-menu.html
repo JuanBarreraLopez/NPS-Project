@@ -1,0 +1,24 @@
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h3>NPS Admin</h3>
+  </div>
+  
+  <ul class="nav-links">
+    <li>
+      <a routerLink="/admin/dashboard" routerLinkActive="active">
+        <span class="icon">📊</span> Dashboard
+      </a>
+    </li>
+    <li>
+      <a routerLink="/admin/register-voter" routerLinkActive="active">
+        <span class="icon">👤</span> Registrar Votante
+      </a>
+    </li>
+  </ul>
+
+  <div class="sidebar-footer">
+    <button (click)="logout()">
+      <span class="icon">🚪</span> Cerrar Sesión
+    </button>
+  </div>
+</div>

@@ -14,14 +14,19 @@
             [value]="summary()?.totalVotes?.toString() || '...'" 
         ></app-metric-card>
 
-        <app-metric-card 
+<app-metric-card 
             label="Promotores (9-10)" 
-            [value]="summary()?.promoters?.toString() || '...'" 
+            [value]="summary()?.promoterCount?.toString() || '0'" 
+        ></app-metric-card>
+
+        <app-metric-card 
+            label="Neutros (7-8)" 
+            [value]="summary()?.neutralCount?.toString() || '0'" 
         ></app-metric-card>
         
         <app-metric-card 
             label="Detractores (0-6)" 
-            [value]="summary()?.detractors?.toString() || '...'" 
+            [value]="summary()?.detractorCount?.toString() || '0'" 
         ></app-metric-card>
     </section>
 

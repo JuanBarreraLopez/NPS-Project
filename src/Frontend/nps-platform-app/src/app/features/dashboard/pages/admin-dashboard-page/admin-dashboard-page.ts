@@ -6,16 +6,17 @@ import { RecentVotesListComponent } from '../../../../shared/organisms/recent-vo
 import { TextLabelComponent } from '../../../../shared/atoms/text-label/text-label';
 
 interface DashboardSummary {
-    npsScore: number;
-    totalVotes: number;
-    promoters: number;
-    passives: number;
-    detractors: number;
+  npsScore: number;
+  totalVotes: number;
+  promoterCount: number; 
+  neutralCount: number; 
+  detractorCount: number; 
 }
+
 interface RecentVote {
-    score: number;
-    comment: string;
-    submittedAt: string;
+  score: number;
+  comment: string;
+  submittedAt: string;
 }
 
 @Component({
@@ -23,7 +24,7 @@ interface RecentVote {
   standalone: true,
   imports: [CommonModule, MetricCardComponent, RecentVotesListComponent, TextLabelComponent],
   templateUrl: './admin-dashboard-page.html',
-  styleUrls: ['./admin-dashboard-page.scss']
+  styleUrls: ['./admin-dashboard-page.scss'],
 })
 export class AdminDashboardPageComponent implements OnInit {
   private dashboardService = inject(DashboardService);
@@ -38,12 +39,12 @@ export class AdminDashboardPageComponent implements OnInit {
   loadDashboardData(): void {
     this.dashboardService.getSummary().subscribe({
       next: (data: DashboardSummary) => this.summary.set(data),
-      error: (err) => console.error('Error cargando resumen:', err) 
+      error: (err) => console.error('Error cargando resumen:', err),
     });
 
     this.dashboardService.getRecentVotes().subscribe({
       next: (data: RecentVote[]) => this.recentVotes.set(data),
-      error: (err) => console.error('Error cargando votos recientes:', err)
+      error: (err) => console.error('Error cargando votos recientes:', err),
     });
   }
 }

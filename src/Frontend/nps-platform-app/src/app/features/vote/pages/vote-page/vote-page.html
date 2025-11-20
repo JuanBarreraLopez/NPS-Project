@@ -1,0 +1,57 @@
+<div class="vote-wrapper">
+  <div class="card">
+
+    <ng-container *ngIf="!hasVoted(); else thankYou">
+      <h1>Encuesta NPS</h1>
+      <p class="question">¿Qué tan probable es que recomiendes nuestro servicio a un amigo o colega?</p>
+
+      <div class="nps-scale">
+        <button
+          *ngFor="let num of scale"
+          type="button"
+          class="score-btn"
+          [class.active]="selectedScore() === num"
+          [class.promoter]="num >= 9"
+          [class.passive]="num >= 7 && num <= 8"
+          [class.detractor]="num <= 6"
+          (click)="setScore(num)">
+          {{ num }}
+        </button>
+      </div>
+
+      <div class="labels">
+        <span>0 - Nada probable</span>
+        <span>10 - Muy probable</span>
+      </div>
+
+      <div class="comment-box">
+        <label>Comentario (Opcional)</label>
+        <textarea [ngModel]="comment()" (ngModelChange)="comment.set($event)" rows="3"></textarea>
+      </div>
+
+      <div *ngIf="errorMessage()" class="error-msg">
+        {{ errorMessage() }}
+      </div>
+
+      <div class="actions">
+        <app-button
+          [disabled]="selectedScore() === null || loading()"
+          [loading]="loading()"
+          (click)="submit()"
+          appearance="primary">
+          Enviar Voto
+        </app-button>
+      </div>
+    </ng-container>
+
+    <ng-template #thankYou>
+      <div class="success-state">
+        <div class="icon">✅</div>
+        <h2>¡Gracias por tu voto!</h2>
+        <p>Tu opinión es muy importante para nosotros.</p>
+        <p class="small">Cerrando sesión...</p>
+      </div>
+    </ng-template>
+
+  </div>
+</div>

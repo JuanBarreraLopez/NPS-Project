@@ -1,0 +1,42 @@
+<div class="registration-container">
+  <h2>👤 Registrar Nuevo Votante</h2>
+  
+  <div *ngIf="message()" class="alert" [ngClass]="message()?.type">
+    {{ message()?.text }}
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off"> <div class="form-group">
+      <label>Nombre de Usuario</label>
+      <input 
+        type="text" 
+        formControlName="username" 
+        placeholder="Ej: daniela" 
+        class="input-control"
+        autocomplete="off"> <div *ngIf="form.get('username')?.touched && form.get('username')?.invalid" class="error-text">
+        Requerido (mínimo 3 caracteres).
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Contraseña Temporal</label>
+      <input 
+        type="password" 
+        formControlName="password" 
+        placeholder="Mínimo 8 caracteres" 
+        class="input-control"
+        autocomplete="new-password"> <div *ngIf="form.get('password')?.touched && form.get('password')?.invalid" class="error-text">
+        La contraseña debe tener al menos 8 caracteres.
+      </div>
+    </div>
+
+    <div class="actions">
+      <app-button 
+        [loading]="loading()" 
+        [disabled]="form.invalid || loading()" 
+        appearance="primary">
+        Registrar Votante
+      </app-button>
+    </div>
+
+  </form>
+</div>

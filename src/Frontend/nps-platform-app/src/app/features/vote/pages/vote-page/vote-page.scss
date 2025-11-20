@@ -1,0 +1,30 @@
+.vote-wrapper {
+  display: flex; justify-content: center; align-items: center; min-height: 80vh; padding: 20px;
+}
+.card {
+  background: white; padding: 40px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  max-width: 800px; width: 100%; text-align: center;
+}
+.question { font-size: 1.2rem; margin-bottom: 30px; font-weight: 500; }
+
+.nps-scale {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 15px;
+}
+
+.score-btn {
+  width: 45px; height: 45px; border-radius: 50%; border: 1px solid #ddd; background: #fff;
+  cursor: pointer; font-weight: bold; transition: all 0.2s ease;
+  &:hover { transform: scale(1.1); }
+  &.active { color: white; border-color: transparent; transform: scale(1.15); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+  &.active.detractor { background-color: #dc3545; }
+  &.active.passive { background-color: #ffc107; color: #333; }
+  &.active.promoter { background-color: #28a745; }
+}
+
+.labels { display: flex; justify-content: space-between; color: #777; font-size: 0.85rem; margin-bottom: 30px; }
+.comment-box {
+  text-align: left; margin-bottom: 20px;
+  textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+}
+.error-msg { color: #dc3545; margin-bottom: 15px; }
+.success-state { .icon { font-size: 3rem; margin-bottom: 15px; } }

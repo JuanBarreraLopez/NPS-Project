@@ -7,15 +7,15 @@
 }
 
 :root {
-  --color-primary: #007bff;        // Azul brillante
-  --color-primary-dark: #0056b3;   // Azul oscuro para hover
-  --color-secondary: #6c757d;      // Gris para texto secundario
-  --color-background: #f4f7f6;    // Fondo muy claro
-  --color-card-bg: #ffffff;        // Fondo de tarjeta
-  --color-border: #e9ecef;         // Borde de tarjeta
-  --color-success: #28a745;        // Promotor (Verde)
-  --color-danger: #dc3545;         // Detractor (Rojo)
-  --color-warning: #ffc107;        // Pasivo (Amarillo)
+  --color-primary: #007bff;
+  --color-primary-dark: #0056b3;
+  --color-secondary: #6c757d;
+  --color-background: #f4f7f6;
+  --color-card-bg: #ffffff;
+  --color-border: #e9ecef;
+  --color-success: #28a745;
+  --color-danger: #dc3545;
+  --color-warning: #ffc107;
 }
 
 body {
@@ -25,7 +25,6 @@ body {
   line-height: 1.6;
 }
 
-/* Base de Contenedores */
 .container {
   max-width: 1200px;
   margin: 0 auto;
